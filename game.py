@@ -1,8 +1,9 @@
-import sys
 import pygame
+import sys
 
-from scripts.utils import load_image
+from scripts.utils import load_image, load_images
 from scripts.entities import PhysicsEntity
+from scripts.tilemap import Tilemap
 
 
 class Game:
@@ -12,6 +13,9 @@ class Game:
 
         # creates the window
         self.screen = pygame.display.set_mode((640, 480))
+
+        # render onto the display and scale it up
+        self.display = pygame.Surface((320, 240))
 
         # restrict framerate to 60fps
         self.clock = pygame.time.Clock()
@@ -29,15 +33,23 @@ class Game:
         self.movement = [False, False]
 
         self.assets = {
+            'decor': load_images('tiles/decor'),
+            'grass': load_images('tiles/grass'),
+            'large_decor': load_images('tiles/large_decor'),
+            'stone': load_images('tiles/stone'),
             'player': load_image('entities/player.png')
         }
 
         self.player = PhysicsEntity(self, 'player', (50, 50), (8, 15))
 
+        self.tilemap = Tilemap(self,tile_size=16)
+
     def run(self):
         while True:
             # need to clear screen after each frame
-            self.screen.fill((14, 219, 248))
+            self.display.fill((14, 219, 248))
+
+            self.tilemap.render(self.display)
             # 0 on y-axis bc platformers only go right/left not up/down
             self.player.update((self.movement[1] - self.movement[0], 0))
             # MORE DEMONSTRATION CODE USEFUL TO KNOW -- KEEPING IT
@@ -57,7 +69,7 @@ class Game:
 
             # gets user input
 
-            self.player.render(self.screen)
+            self.player.render(self.display)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -78,6 +90,7 @@ class Game:
                     if event.key == pygame.K_RIGHT:
                         self.movement[1] = False
 
+            self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
             pygame.display.update()
             self.clock.tick(60)
 
