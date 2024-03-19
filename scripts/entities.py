@@ -18,5 +18,10 @@ class PhysicsEntity:
         self.pos[0] += frame_movement[0]  # updating x position
         self.pos[1] += frame_movement[1]  # updating y position
 
+        # apply acceleration by modifying velocity
+        # positive y is down = max velocity of 5 downwards
+        # this prevents terminal velocity
+        self.velocity[1] = min(5, self.velocity[1] + 0.1)
+
     def render(self, surf):
         surf.blit(self.game.assets['player'], self.pos)
